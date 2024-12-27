@@ -1,7 +1,6 @@
-// src/components/Auth/Register.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../services/authService'; // Importa a função de registro
+import { registerUser } from '../services/authService'; 
 
 const Register = () => {
   const [username, setFullName] = useState('');
@@ -14,9 +13,8 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      // Chama o serviço para registrar o usuário
       await registerUser(username, email, password);
-      navigate('/'); // Redireciona para a página de login após o registro
+      navigate('/'); 
       alert('Registro bem-sucedido!');
     } catch (error) {
       setErro('Erro no registro. Tente novamente!');
