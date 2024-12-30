@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuthenticatedData } from '../services/authService';
 import Map from './Map';
@@ -7,12 +7,14 @@ const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [location, setLocation] = useState(null);
   const [error, setError] = useState('');
-  const [status, setStatus] = useState(''); // Novo estado para feedback ao usuário
+  const [status, setStatus] = useState('');
   const navigate = useNavigate();
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3333';
+  
+  // Ref para garantir que a localização seja enviada apenas uma vez
+  const locationSent = useRef(false);
 
-  // Definindo a função sendLocationToBackend com useCallback
   const sendLocationToBackend = useCallback(async (latitude, longitude) => {
     try {
       const token = localStorage.getItem('authToken');
@@ -37,7 +39,6 @@ const Profile = () => {
     }
   }, [BACKEND_URL]);
 
-  // useEffect que depende de sendLocationToBackend
   useEffect(() => {
     const token = localStorage.getItem('authToken');
 
@@ -52,20 +53,23 @@ const Profile = () => {
         const data = await getAuthenticatedData();
         setUserData(data);
 
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const userLocation = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            };
-            setLocation(userLocation);
-            sendLocationToBackend(userLocation.latitude, userLocation.longitude);
-          },
-          (geoError) => {
-            console.error('Erro ao obter a localização:', geoError.message);
-            setError('Não foi possível obter a localização.');
-          }
-        );
+        if (!locationSent.current && !location) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const userLocation = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              };
+              setLocation(userLocation);
+              sendLocationToBackend(userLocation.latitude, userLocation.longitude);
+              locationSent.current = true; // Marca que a localização foi enviada
+            },
+            (geoError) => {
+              console.error('Erro ao obter a localização:', geoError.message);
+              setError('Não foi possível obter a localização.');
+            }
+          );
+        }
       } catch (authError) {
         setError('Erro ao carregar os dados');
         console.error(authError);
@@ -73,7 +77,7 @@ const Profile = () => {
     };
 
     loadUserData();
-  }, [navigate, sendLocationToBackend]); // Incluindo sendLocationToBackend nas dependências
+  }, [navigate, sendLocationToBackend, location]); // location é ainda usado para evitar múltiplas execuções
 
   const logout = () => {
     localStorage.removeItem('authToken');
@@ -84,7 +88,7 @@ const Profile = () => {
   return (
     <div className="profile-container">
       {error && <p className="error">{error}</p>}
-      {status && <p className="status">{status}</p>} {/* Feedback para o usuário */}
+      {status && <p className="status">{status}</p>}
       {userData ? (
         <div>
           <h2>Bem-vindo, {userData.full_name}</h2>
