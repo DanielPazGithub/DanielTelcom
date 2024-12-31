@@ -2,17 +2,16 @@ import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import ambulanceIcon from '../assets/ambulance-icon.png';
 
-// Corrigir o problema do ícone padrão do Leaflet
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-let DefaultIcon = L.icon({
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
+// Criar o ícone personalizado
+const AmbulanceIcon = L.icon({
+  iconUrl: ambulanceIcon,
+  iconSize: [38, 38], // Tamanho do ícone (ajuste conforme necessário)
+  iconAnchor: [19, 38], // Ponto de ancoragem (base do ícone)
+  popupAnchor: [0, -38], // Posição do popup em relação ao ícone
 });
-
-L.Marker.prototype.options.icon = DefaultIcon;
 
 const Map = ({ latitude, longitude }) => {
   return (
@@ -25,7 +24,7 @@ const Map = ({ latitude, longitude }) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      <Marker position={[latitude, longitude]}>
+      <Marker position={[latitude, longitude]} icon={AmbulanceIcon}>
         <Popup>Você está aqui!</Popup>
       </Marker>
     </MapContainer>

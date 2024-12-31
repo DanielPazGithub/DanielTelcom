@@ -5,6 +5,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Profile from './components/Profile'; 
 import AdminLogin from './components/AdminLogin'; 
+import DetailPage from './components/DetailPage';
 import './App.css';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/Admin-login" element={<AdminLogin />} />
+          <Route path="/:type" element={<DetailPage />} />
         </Routes>
       </div>
     </Router>
