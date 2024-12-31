@@ -1,36 +1,36 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authenticateUser } from '../services/authService';
+import { authenticateAdmin } from '../services/authService';
 
-const Login = () => {
+const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [erro, setErro] = useState('');
   const navigate = useNavigate();
 
-  const loginUser = async (email, password) => {
+  const loginAdmin = async (email, password) => {
     try {
-      const response = await authenticateUser(email, password);
+      const response = await authenticateAdmin(email, password);
       const { token } = response;
 
       localStorage.setItem('authToken', token);
       localStorage.setItem('authType', 'bearer');
 
-      navigate('/profile');
+      navigate('/admin-dashboard');
     } catch (error) {
-      setErro('Erro ao fazer login');
+      setErro('Erro ao fazer login como admin');
       console.error(error);
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    loginUser(email, password);
+    loginAdmin(email, password);
   };
 
   return (
     <div className="login-container">
-      <h2>Login</h2>
+      <h2>Login de Administrador</h2>
       {erro && <p className="error">{erro}</p>}
       <form onSubmit={handleSubmit}>
         <div>
@@ -51,16 +51,11 @@ const Login = () => {
             required
           />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit">Login como Admin</button>
       </form>
-      <p>
-        Não tem uma conta? <a href="/register">Registrar</a>
-      </p>
-      <p>
-        Login como <a href="/admin-login">Administrador</a>
-      </p>
+      
     </div>
   );
 };
 
-export default Login;
+export default AdminLogin;

@@ -56,3 +56,20 @@ export const getAuthenticatedData = async () => {
     throw error;
   }
 };
+
+export const authenticateAdmin = async (email, password) => {
+  try {
+    const response = await axios.post(`${API_URL}/admin/authenticate`, {
+      email,
+      password,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
