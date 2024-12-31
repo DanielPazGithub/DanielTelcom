@@ -12,7 +12,6 @@ const Profile = () => {
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3333';
   
-  // Ref para garantir que a localização seja enviada apenas uma vez
   const locationSent = useRef(false);
 
   const sendLocationToBackend = useCallback(async (latitude, longitude) => {
@@ -62,7 +61,7 @@ const Profile = () => {
               };
               setLocation(userLocation);
               sendLocationToBackend(userLocation.latitude, userLocation.longitude);
-              locationSent.current = true; // Marca que a localização foi enviada
+              locationSent.current = true;
             },
             (geoError) => {
               console.error('Erro ao obter a localização:', geoError.message);
@@ -77,7 +76,7 @@ const Profile = () => {
     };
 
     loadUserData();
-  }, [navigate, sendLocationToBackend, location]); // location é ainda usado para evitar múltiplas execuções
+  }, [navigate, sendLocationToBackend, location]);
 
   const logout = () => {
     localStorage.removeItem('authToken');
