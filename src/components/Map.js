@@ -4,7 +4,6 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import ambulanceIcon from '../assets/ambulance-icon.png';
 
-
 // Criar o ícone personalizado
 const AmbulanceIcon = L.icon({
   iconUrl: ambulanceIcon,
@@ -13,10 +12,10 @@ const AmbulanceIcon = L.icon({
   popupAnchor: [0, -38], // Posição do popup em relação ao ícone
 });
 
-const Map = ({ latitude, longitude }) => {
+const Map = ({ locations }) => {
   return (
     <MapContainer
-      center={[latitude, longitude]}
+      center={[locations[0]?.latitude || 0, locations[0]?.longitude || 0]} // Define o centro inicial como a primeira localização
       zoom={13}
       style={{ height: '400px', width: '100%' }}
     >
@@ -24,9 +23,17 @@ const Map = ({ latitude, longitude }) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      <Marker position={[latitude, longitude]} icon={AmbulanceIcon}>
-        <Popup>Você está aqui!</Popup>
-      </Marker>
+      
+      {/* Marcadores para todas as localizações */}
+      {locations.map((location, index) => (
+        <Marker
+          key={index}
+          position={[location.latitude, location.longitude]}
+          icon={AmbulanceIcon}
+        >
+          <Popup>{`Localização ${index + 1}`}</Popup>
+        </Marker>
+      ))}
     </MapContainer>
   );
 };

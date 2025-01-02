@@ -5,7 +5,8 @@ import Map from './Map';
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState(null); 
+  const [locations, setLocations] = useState([]); 
   const [error, setError] = useState('');
   const [status, setStatus] = useState('');
   const navigate = useNavigate();
@@ -37,20 +38,45 @@ const Profile = () => {
     }
   }, [BACKEND_URL]);
 
+  // Função para buscar as localizações salvas
+  const fetchUserLocations = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${BACKEND_URL}/locations`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const locationsData = await response.json();
+        setLocations(locationsData); 
+      } else {
+        throw new Error('Erro ao carregar localizações');
+      }
+    } catch (error) {
+      setError('Erro ao carregar as localizações');
+      console.error(error);
+    }
+  }, [BACKEND_URL]);
+
   useEffect(() => {
     const token = localStorage.getItem('authToken');
-
+  
     if (!token) {
       setError('Você precisa estar logado para acessar esta página.');
       navigate('/');
       return;
     }
-
+  
     const loadUserData = async () => {
       try {
         const data = await getAuthenticatedData();
         setUserData(data);
-
+  
+        // Carregar as localizações salvas
+        fetchUserLocations();
+  
         if (!locationSent.current && !location) {
           navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -73,9 +99,9 @@ const Profile = () => {
         console.error(authError);
       }
     };
-
+  
     loadUserData();
-  }, [navigate, sendLocationToBackend, location]);
+  }, [navigate, sendLocationToBackend, location, fetchUserLocations, BACKEND_URL]); // Incluímos o BACKEND_URL nas dependências
 
   const logout = () => {
     localStorage.removeItem('authToken');
@@ -113,7 +139,8 @@ const Profile = () => {
         {userData && location && (
           <>
             <h2>Bem-vindo, {userData.full_name}</h2>
-            <Map latitude={location.latitude} longitude={location.longitude} />
+            {/* Passando todas as localizações para o componente de mapa */}
+            <Map locations={[...locations, location]} />
             <button className="logout-button" onClick={logout}>
               Sair
             </button>
