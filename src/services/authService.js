@@ -1,7 +1,7 @@
 // src/services/authService.js
 import axios from 'axios';
 
-const API_URL = 'https://backend-geolocalizacao-lovat.vercel.app';
+const API_URL = 'https://backend-geolocalizacao.onrender.com';
 
 export const registerUser = async (username, email, password) => {
   try {
