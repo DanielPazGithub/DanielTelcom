@@ -42,7 +42,7 @@ const Profile = () => {
   const fetchUserLocations = useCallback(async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`${BACKEND_URL}/locations`, {
+      const response = await fetch(`${BACKEND_URL}/all`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
