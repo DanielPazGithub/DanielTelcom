@@ -2,7 +2,7 @@ import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import ambulanceIcon from '../assets/ambulance-icon.png';
+import ambulanceIcon from '../assets/ambulance-icon2.png';
 
 // Criar o ícone personalizado
 const AmbulanceIcon = L.icon({
