@@ -15,7 +15,7 @@ const AmbulanceIcon = L.icon({
 const Map = ({ locations }) => {
   return (
     <MapContainer
-      center={[locations[0]?.latitude || 0, locations[0]?.longitude || 0]} // Define o centro inicial como a primeira localização
+      center={[locations[0]?.latitude || 0, locations[0]?.longitude || 0]}  // Definindo a localização inicial
       zoom={13}
       style={{ height: '400px', width: '100%' }}
     >
@@ -23,15 +23,9 @@ const Map = ({ locations }) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      
-      {/* Marcadores para todas as localizações */}
-      {locations.map((location, index) => (
-        <Marker
-          key={index}
-          position={[location.latitude, location.longitude]}
-          icon={AmbulanceIcon}
-        >
-          <Popup>{`Localização ${index + 1}`}</Popup>
+      {locations.map((loc, index) => (
+        <Marker key={index} position={[loc.latitude, loc.longitude]} icon={AmbulanceIcon}>
+          <Popup>Localização {index + 1}</Popup>
         </Marker>
       ))}
     </MapContainer>

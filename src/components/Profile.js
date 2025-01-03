@@ -5,20 +5,44 @@ import Map from './Map';
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
-  const [location, setLocation] = useState(null); 
-  const [locations, setLocations] = useState([]); 
+  const [location, setLocation] = useState(null);
+  const [locations, setLocations] = useState([]);  // Para armazenar todas as localizações
   const [error, setError] = useState('');
   const [status, setStatus] = useState('');
   const navigate = useNavigate();
 
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3333';
+  const API_URL = 'https://backend-geolocalizacao.onrender.com';
 
   const locationSent = useRef(false);
 
+  // Função para buscar as localizações
+  const fetchLocations = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${API_URL}/all`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao carregar as localizações');
+      }
+
+      const data = await response.json();
+      setLocations(data);  // Armazena as localizações no estado
+    } catch (error) {
+      setError('Erro ao carregar as localizações');
+      console.error(error);
+    }
+  }, [API_URL]);
+
+  // Enviar a localização atual para o backend
   const sendLocationToBackend = useCallback(async (latitude, longitude) => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`${BACKEND_URL}/location`, {
+      const response = await fetch(`${API_URL}/location`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,47 +60,25 @@ const Profile = () => {
       console.error('Erro ao enviar localização:', error.message);
       setStatus('Erro ao enviar localização.');
     }
-  }, [BACKEND_URL]);
-
-  // Função para buscar as localizações salvas
-  const fetchUserLocations = useCallback(async () => {
-    try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(`${BACKEND_URL}/all`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const locationsData = await response.json();
-        setLocations(locationsData); 
-      } else {
-        throw new Error('Erro ao carregar localizações');
-      }
-    } catch (error) {
-      setError('Erro ao carregar as localizações');
-      console.error(error);
-    }
-  }, [BACKEND_URL]);
+  }, [API_URL]);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
-  
+
     if (!token) {
       setError('Você precisa estar logado para acessar esta página.');
       navigate('/');
       return;
     }
-  
+
     const loadUserData = async () => {
       try {
         const data = await getAuthenticatedData();
         setUserData(data);
-  
-        // Carregar as localizações salvas
-        fetchUserLocations();
-  
+
+        // Buscar todas as localizações
+        await fetchLocations();
+
         if (!locationSent.current && !location) {
           navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -99,9 +101,9 @@ const Profile = () => {
         console.error(authError);
       }
     };
-  
+
     loadUserData();
-  }, [navigate, sendLocationToBackend, location, fetchUserLocations, BACKEND_URL]); // Incluímos o BACKEND_URL nas dependências
+  }, [navigate, sendLocationToBackend, location, fetchLocations]);
 
   const logout = () => {
     localStorage.removeItem('authToken');
@@ -139,7 +141,7 @@ const Profile = () => {
         {userData && location && (
           <>
             <h2>Bem-vindo, {userData.full_name}</h2>
-            {/* Passando todas as localizações para o componente de mapa */}
+            {/* Passando todas as localizações para o Map */}
             <Map locations={[...locations, location]} />
             <button className="logout-button" onClick={logout}>
               Sair
