@@ -25,7 +25,9 @@ const Map = ({ locations }) => {
       />
       {locations.map((loc, index) => (
         <Marker key={index} position={[loc.latitude, loc.longitude]} icon={AmbulanceIcon}>
-          <Popup>Localização {index + 1}</Popup>
+          <Popup>
+            {loc.username || 'Usuário desconhecido'} - {new Date(loc.created_at).toLocaleString()}
+          </Popup>
         </Marker>
       ))}
     </MapContainer>
